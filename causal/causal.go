@@ -13,12 +13,12 @@ type RemotePeer[Operation any] interface {
 }
 
 type SyncMsg[Operation any] struct {
-	DoYouKnowOf struct {
+	DoYouKnow struct {
 		IDs      []EventID
 		Versions []Version
 	}
 
-	IKnowOf []EventID
+	IDontKnow []EventID
 
 	LetMeIntroduce struct {
 		Ats        []PeerID
