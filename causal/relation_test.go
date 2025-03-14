@@ -3,9 +3,10 @@ package causal_test
 import (
 	"testing"
 
-	"github.com/prelift/replicateddata/causal"
 	"github.com/szabba/assert/v3"
 	"github.com/szabba/assert/v3/assertions/theval"
+
+	"github.com/prelift/replicateddata-go/causal"
 )
 
 func TestRelation(t *testing.T) {

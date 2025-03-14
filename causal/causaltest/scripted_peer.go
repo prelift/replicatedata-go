@@ -7,7 +7,7 @@ import (
 	"net"
 	"reflect"
 
-	"github.com/prelift/replicateddata/causal"
+	"github.com/prelift/replicateddata-go/causal"
 )
 
 func ErrScriptMismatch() error { return errScriptMismatch }
