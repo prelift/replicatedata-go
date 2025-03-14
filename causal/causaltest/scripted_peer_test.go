@@ -5,11 +5,12 @@ import (
 	"net"
 	"testing"
 
-	"github.com/prelift/replicateddata/causal"
-	"github.com/prelift/replicateddata/causal/causaltest.go"
 	"github.com/szabba/assert/v3"
 	"github.com/szabba/assert/v3/assertions/theerr"
 	"github.com/szabba/assert/v3/assertions/theval"
+
+	"github.com/prelift/replicateddata-go/causal"
+	"github.com/prelift/replicateddata-go/causal/causaltest"
 )
 
 func TestScriptedPeer(t *testing.T) {
