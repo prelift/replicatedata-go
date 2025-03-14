@@ -33,7 +33,11 @@ type Snapshot[Operation any] struct{}
 
 type Transaction[Operation any] struct{}
 
-func (log *Log[Operation]) Sync(ctx context.Context, p RemotePeer[Operation]) error {
+func (log *Log[Operation]) SyncTo(ctx context.Context, p RemotePeer[Operation]) error {
+	return nil
+}
+
+func (log *Log[Operation]) SyncFrom(ctx context.Context, p RemotePeer[Operation]) error {
 	return nil
 }
 
