@@ -7,25 +7,6 @@ import (
 	"unique"
 )
 
-type RemotePeer[Operation any] interface {
-	Send(ctx context.Context, msg SyncMsg[Operation]) error
-	Recv(ctx context.Context) (SyncMsg[Operation], error)
-}
-
-type SyncMsg[Operation any] struct {
-	DoYouKnow struct {
-		IDs      []EventID
-		Versions []Version
-	}
-
-	IDontKnow []EventID
-
-	LetMeIntroduce struct {
-		Ats        []PeerID
-		Operations [][]Operation
-	}
-}
-
 // A Log is a causally-ordered log of events.
 type Log[Operation any] struct{}
 

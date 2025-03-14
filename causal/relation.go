@@ -25,7 +25,7 @@ func After() Relation { return Relation{4} }
 func (cr Relation) String() string {
 	switch cr {
 	case UnknownOrder():
-		return "Unknown"
+		return "UnknownOrder"
 	case Before():
 		return "Before"
 	case Concurrent():

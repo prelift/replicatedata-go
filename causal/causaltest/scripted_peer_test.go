@@ -33,10 +33,9 @@ func TestScriptedPeer(t *testing.T) {
 		var peer causaltest.ScriptedPeer[int]
 
 		want := causal.SyncMsg[int]{}
-		want.DoYouKnow.IDs = make([]causal.EventID, 1)
-		want.DoYouKnow.Versions = make([]causal.Version, 1)
+		want.DoYouKnow = []causal.RawEventID{"e-1"}
 
-		peer.ScriptSend(want, nil)
+		peer.ScriptRecv(want, nil)
 
 		// when
 		msg, err := peer.Recv(context.Background())
@@ -101,12 +100,12 @@ func TestScriptedPeer(t *testing.T) {
 		var peer causaltest.ScriptedPeer[int]
 
 		expect := causal.SyncMsg[int]{}
-		expect.IDontKnow = make([]causal.EventID, 1)
+		expect.IDontKnow = []causal.RawEventID{"e-1"}
 
 		peer.ScriptSend(expect, nil)
 
 		msg := causal.SyncMsg[int]{}
-		msg.IDontKnow = make([]causal.EventID, 2)
+		msg.IDontKnow = []causal.RawEventID{"e-1", "e-2"}
 
 		// when
 		err := peer.Send(context.Background(), msg)
@@ -121,7 +120,7 @@ func TestScriptedPeer(t *testing.T) {
 		var peer causaltest.ScriptedPeer[int]
 
 		expect := causal.SyncMsg[int]{}
-		expect.IDontKnow = make([]causal.EventID, 1)
+		expect.IDontKnow = []causal.RawEventID{"e-1"}
 
 		peer.ScriptSend(expect, net.ErrWriteToConnected)
 
@@ -138,7 +137,7 @@ func TestScriptedPeer(t *testing.T) {
 		var peer causaltest.ScriptedPeer[int]
 
 		give := causal.SyncMsg[int]{}
-		give.IDontKnow = make([]causal.EventID, 1)
+		give.IDontKnow = []causal.RawEventID{"e-1"}
 
 		peer.ScriptRecv(give, nil)
 
