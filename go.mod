@@ -1,4 +1,4 @@
-module github.com/prelift/replicateddata
+module github.com/prelift/replicateddata-go
 
 go 1.24.0
 
