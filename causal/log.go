@@ -1,0 +1,65 @@
+package causal
+
+import (
+	"context"
+	"errors"
+	"fmt"
+)
+
+// ErrEmptyPeerID indicates a peer ID was empty.
+func ErrEmptyPeerID() error { return errEmptyPeerID }
+
+var errEmptyPeerID = errors.New("empty peer ID")
+
+// A Log is a causally-ordered log of events.
+type Log[Operation any] struct {
+	here PeerID
+}
+
+// NewLog creates a new log.
+//
+// The zero value is not useful.
+// Clients must call NewLog to get a log that's good for something.
+func NewLog[Operation any](opts ...LogOptions[Operation]) (_ *Log[Operation], err error) {
+
+	defer func() {
+		if err != nil {
+			err = fmt.Errorf("causal.NewLog: %w", err)
+		}
+	}()
+
+	log := new(Log[Operation])
+
+	err = defaultOpts[Operation]().apply(log)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, o := range opts {
+		err = o.apply(log)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return log, nil
+}
+
+func defaultOpts[Operation any]() LogOptions[Operation] {
+	return WithRandomPeerID[Operation]()
+}
+
+// Here is the local peer ID.
+func (log *Log[Operation]) Here() PeerID { return log.here }
+
+func (log *Log[Operation]) SyncTo(ctx context.Context, p RemotePeer[Operation]) error {
+	return nil
+}
+
+func (log *Log[Operation]) SyncFrom(ctx context.Context, p RemotePeer[Operation]) error {
+	return nil
+}
+
+func (log *Log[Operation]) Snapshot() Snapshot[Operation] {
+	panic("TODO")
+}

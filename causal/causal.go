@@ -7,28 +7,9 @@ import (
 	"unique"
 )
 
-// A Log is a causally-ordered log of events.
-type Log[Operation any] struct{}
-
 type Snapshot[Operation any] struct{}
 
 type Transaction[Operation any] struct{}
-
-func (log *Log[Operation]) SyncTo(ctx context.Context, p RemotePeer[Operation]) error {
-	return nil
-}
-
-func (log *Log[Operation]) SyncFrom(ctx context.Context, p RemotePeer[Operation]) error {
-	return nil
-}
-
-func (log *Log[Operation]) Here() PeerID {
-	panic("TODO")
-}
-
-func (log *Log[Operation]) Snapshot() Snapshot[Operation] {
-	panic("TODO")
-}
 
 // Guarantees that snapshots created by local transactions on the latest snapshot come before ones due to remote sync.
 func (lob *Log[Operation]) Snapshots() iter.Seq[Snapshot[Operation]] {
@@ -97,5 +78,9 @@ func (v Version) LatestEvents() iter.Seq[EventID] {
 }
 
 type PeerID struct{ h unique.Handle[string] }
+
+func (id PeerID) String() string { return id.h.Value() }
+
+func (id PeerID) Raw() RawPeerID { return RawPeerID(id.h.Value()) }
 
 type EventID struct{ h unique.Handle[string] }
