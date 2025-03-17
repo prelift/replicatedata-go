@@ -70,9 +70,10 @@ func (log *Log[Operation]) Here() PeerID {
 	return log.here
 }
 
+// Snapshot takes a snapshot of the current state of the log.
 func (log *Log[Operation]) Snapshot() Snapshot[Operation] {
 	log.wasInited()
-	return Snapshot[Operation]{}
+	return Snapshot[Operation]{log: log}
 }
 
 func (log *Log[Operation]) SyncTo(ctx context.Context, p RemotePeer[Operation]) error {

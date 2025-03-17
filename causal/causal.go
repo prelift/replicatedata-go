@@ -7,34 +7,7 @@ import (
 	"unique"
 )
 
-type Snapshot[Operation any] struct{}
-
 type Transaction[Operation any] struct{}
-
-// Guarantees that snapshots created by local transactions on the latest snapshot come before ones due to remote sync.
-func (lob *Log[Operation]) Snapshots() iter.Seq[Snapshot[Operation]] {
-	panic("TODO")
-}
-
-func (s Snapshot[Operation]) Here() PeerID {
-	panic("TODO")
-}
-
-func (s Snapshot[Operation]) Version() Version {
-	panic("TODO")
-}
-
-func (s Snapshot[Operation]) Event(id EventID) (Event[Operation], bool) {
-	panic("TODO")
-}
-
-func (s Snapshot[Operation]) Changes() iter.Seq[Event[Operation]] {
-	panic("TODO")
-}
-
-func (s Snapshot[Operation]) Begin() *Transaction[Operation] {
-	panic("TODO")
-}
 
 func (t *Transaction[Operation]) WIP() Snapshot[Operation] {
 	panic("TODO")
