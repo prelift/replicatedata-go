@@ -77,10 +77,13 @@ func (v Version) LatestEvents() iter.Seq[EventID] {
 	return slices.Values(v.frontier)
 }
 
+// A PeerID uniquely identifies a peer.
 type PeerID struct{ h unique.Handle[string] }
 
 func (id PeerID) String() string { return id.h.Value() }
 
+// RawPeerID is the raw form of a peer ID.
+// Raw IDs are used in sync messages.
 func (id PeerID) Raw() RawPeerID { return RawPeerID(id.h.Value()) }
 
 type EventID struct{ h unique.Handle[string] }
