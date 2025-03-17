@@ -3,16 +3,48 @@ package causal_test
 import (
 	"testing"
 
-	"github.com/prelift/replicateddata-go/causal"
 	"github.com/szabba/assert/v3"
 	"github.com/szabba/assert/v3/assertions/theerr"
 	"github.com/szabba/assert/v3/assertions/theval"
+
+	"github.com/prelift/replicateddata-go/causal"
+	"github.com/prelift/replicateddata-go/internal/catch"
 )
 
 func TestLog(t *testing.T) {
 
 	t.Run("Zero", func(t *testing.T) {
-		// TODO: write
+		// given
+		for name, f := range noninitLogCases() {
+			t.Run(name, func(t *testing.T) {
+
+				var zero *causal.Log[int]
+
+				// when
+				caught := catch.Panic(func() { f(zero) })
+
+				// then
+				assert.UsingFmt(t.Errorf).
+					That(theval.Equal(caught, "log is nil"))
+			})
+		}
+	})
+
+	t.Run("PtrToZero", func(t *testing.T) {
+		// given
+		for name, f := range noninitLogCases() {
+			t.Run(name, func(t *testing.T) {
+
+				var zero causal.Log[int]
+
+				// when
+				caught := catch.Panic(func() { f(&zero) })
+
+				// then
+				assert.UsingFmt(t.Errorf).
+					That(theval.Equal(caught, "log is nil"))
+			})
+		}
 	})
 
 	t.Run("NewLog", func(t *testing.T) {
@@ -61,4 +93,10 @@ func TestLog(t *testing.T) {
 
 	})
 
+}
+
+func noninitLogCases() map[string]func(log *causal.Log[int]) {
+	return map[string]func(*causal.Log[int]){
+		"Here": func(l *causal.Log[int]) { l.Here() },
+	}
 }
