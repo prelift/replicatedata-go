@@ -35,9 +35,9 @@ func TestSnapshot(t *testing.T) {
 		log, err := causal.NewLog[int]()
 		assert.UsingFmt(t.Fatalf).That(theerr.IsNil(err))
 
-		want := log.Here()
-
 		snapshot := log.Snapshot()
+
+		want := log.Here()
 
 		// when
 		got := snapshot.Here()
@@ -47,10 +47,31 @@ func TestSnapshot(t *testing.T) {
 			That(theval.Equal(got, want))
 	})
 
+	t.Run("Version", func(t *testing.T) {
+
+		t.Run("EmptyLog", func(t *testing.T) {
+			// given
+			log, err := causal.NewLog[int]()
+			assert.UsingFmt(t.Fatalf).That(theerr.IsNil(err))
+
+			snapshot := log.Snapshot()
+
+			var want causal.Version
+
+			// when
+			got := snapshot.Version()
+
+			// then
+			assert.UsingFmt(t.Errorf).
+				That(theval.DeepEqual(got, want))
+		})
+
+	})
 }
 
 func noninitSnapshotCases() map[string]func(s causal.Snapshot[int]) {
 	return map[string]func(causal.Snapshot[int]){
-		"Here": func(s causal.Snapshot[int]) { s.Here() },
+		"Here":    func(s causal.Snapshot[int]) { s.Here() },
+		"Version": func(s causal.Snapshot[int]) { s.Version() },
 	}
 }

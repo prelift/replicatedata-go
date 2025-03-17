@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"iter"
 
 	"github.com/szabba/assert/v3"
 )
@@ -74,6 +75,11 @@ func (log *Log[Operation]) Here() PeerID {
 func (log *Log[Operation]) Snapshot() Snapshot[Operation] {
 	log.wasInited()
 	return Snapshot[Operation]{log: log}
+}
+
+// Guarantees that snapshots created by local transactions on the latest snapshot come before ones due to remote sync.
+func (lob *Log[Operation]) Snapshots() iter.Seq[Snapshot[Operation]] {
+	panic("TODO")
 }
 
 func (log *Log[Operation]) SyncTo(ctx context.Context, p RemotePeer[Operation]) error {

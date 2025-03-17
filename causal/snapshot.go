@@ -20,13 +20,9 @@ func (s Snapshot[Operation]) Here() PeerID {
 	return s.log.here
 }
 
-// Guarantees that snapshots created by local transactions on the latest snapshot come before ones due to remote sync.
-func (lob *Log[Operation]) Snapshots() iter.Seq[Snapshot[Operation]] {
-	panic("TODO")
-}
-
 func (s Snapshot[Operation]) Version() Version {
-	panic("TODO")
+	s.wasInited()
+	return Version{}
 }
 
 func (s Snapshot[Operation]) Event(id EventID) (Event[Operation], bool) {
