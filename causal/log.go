@@ -71,7 +71,8 @@ func (log *Log[Operation]) Here() PeerID {
 }
 
 func (log *Log[Operation]) Snapshot() Snapshot[Operation] {
-	panic("TODO")
+	log.wasInited()
+	return Snapshot[Operation]{}
 }
 
 func (log *Log[Operation]) SyncTo(ctx context.Context, p RemotePeer[Operation]) error {

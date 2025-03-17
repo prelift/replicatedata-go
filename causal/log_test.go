@@ -97,6 +97,7 @@ func TestLog(t *testing.T) {
 
 func noninitLogCases() map[string]func(log *causal.Log[int]) {
 	return map[string]func(*causal.Log[int]){
-		"Here": func(l *causal.Log[int]) { l.Here() },
+		"Here":     func(l *causal.Log[int]) { l.Here() },
+		"Snapshot": func(l *causal.Log[int]) { l.Snapshot() },
 	}
 }
