@@ -42,7 +42,7 @@ func TestLog(t *testing.T) {
 
 				// then
 				assert.UsingFmt(t.Errorf).
-					That(theval.Equal(caught, "log is nil"))
+					That(theval.Equal(caught, "log was not initialized"))
 			})
 		}
 	})
