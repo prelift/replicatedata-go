@@ -1,11 +1,19 @@
 package causal
 
-import "context"
+import (
+	"context"
+)
 
 // A RemotePeer can that can be sent and send back sync messages.
 type RemotePeer[Operation any] interface {
+	// Send attempts to send a sync message to the remote peer.
 	Send(ctx context.Context, msg SyncMsg[Operation]) error
+
+	// Recv attempts to receive a sync message from the remote peer.
 	Recv(ctx context.Context) (SyncMsg[Operation], error)
+
+	// Close attempts to inform the remote peer about intentional communication closure.
+	Close(ctx context.Context) error
 }
 
 // A SyncMsg is a message exchanged between peers as part of log syncing.

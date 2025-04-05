@@ -15,7 +15,7 @@ import (
 
 func TestScriptedPeer(t *testing.T) {
 
-	t.Run("RecvReportsNetClosedWithoutScript", func(t *testing.T) {
+	t.Run("UnscriptedRecvReportsMismatch", func(t *testing.T) {
 		// given
 		var peer causaltest.ScriptedPeer[int]
 
@@ -25,7 +25,7 @@ func TestScriptedPeer(t *testing.T) {
 		// then
 		assert.UsingFmt(t.Errorf).
 			That(theval.Zero(msg)).
-			That(theerr.Is(err, net.ErrClosed))
+			That(theerr.Is(err, causaltest.ErrScriptMismatch()))
 	})
 
 	t.Run("RecvReportsScriptedMessage", func(t *testing.T) {
@@ -82,7 +82,22 @@ func TestScriptedPeer(t *testing.T) {
 			That(theerr.Is(err, causaltest.ErrScriptMismatch()))
 	})
 
-	t.Run("SendReportsNetClosedWithoutScript", func(t *testing.T) {
+	t.Run("RecvReportsScriptMismatchWhenACloseWasScripted", func(t *testing.T) {
+		// given
+		var peer causaltest.ScriptedPeer[int]
+
+		peer.ScriptClose(nil)
+
+		// when
+		msg, err := peer.Recv(context.Background())
+
+		// then
+		assert.UsingFmt(t.Errorf).
+			That(theval.Zero(msg)).
+			That(theerr.Is(err, causaltest.ErrScriptMismatch()))
+	})
+
+	t.Run("UnscriptedSendReportsMismatch", func(t *testing.T) {
 		// given
 		var peer causaltest.ScriptedPeer[int]
 		msg := causal.SyncMsg[int]{}
@@ -92,7 +107,7 @@ func TestScriptedPeer(t *testing.T) {
 
 		// then
 		assert.UsingFmt(t.Errorf).
-			That(theerr.Is(err, net.ErrClosed))
+			That(theerr.Is(err, causaltest.ErrScriptMismatch()))
 	})
 
 	t.Run("SendReportsScriptMismatchWhenTheSentMessageDoesNotMatch", func(t *testing.T) {
@@ -143,6 +158,74 @@ func TestScriptedPeer(t *testing.T) {
 
 		// when
 		err := peer.Send(context.Background(), causal.SyncMsg[int]{})
+
+		// then
+		assert.UsingFmt(t.Errorf).
+			That(theerr.Is(err, causaltest.ErrScriptMismatch()))
+	})
+
+	t.Run("SendReportsScriptMismatchWhenACloseWasScripted", func(t *testing.T) {
+		// given
+		var peer causaltest.ScriptedPeer[int]
+
+		peer.ScriptClose(nil)
+
+		// when
+		err := peer.Send(context.Background(), causal.SyncMsg[int]{})
+
+		// then
+		assert.UsingFmt(t.Errorf).
+			That(theerr.Is(err, causaltest.ErrScriptMismatch()))
+	})
+
+	t.Run("UnscriptedCloseReportsMismatch", func(t *testing.T) {
+		// given
+		var peer causaltest.ScriptedPeer[int]
+
+		// when
+		err := peer.Close(context.Background())
+
+		// then
+		assert.UsingFmt(t.Errorf).
+			That(theerr.Is(err, causaltest.ErrScriptMismatch()))
+	})
+
+	t.Run("CloseReportsScriptedError", func(t *testing.T) {
+		// given
+		var peer causaltest.ScriptedPeer[int]
+
+		peer.ScriptClose(net.ErrWriteToConnected)
+
+		// when
+		err := peer.Close(context.Background())
+
+		// then
+		assert.UsingFmt(t.Errorf).
+			That(theerr.Is(err, net.ErrWriteToConnected))
+	})
+
+	t.Run("CloseReportsScriptMismtatchWhenARecvWasScripted", func(t *testing.T) {
+		// given
+		var peer causaltest.ScriptedPeer[int]
+
+		peer.ScriptRecv(causal.SyncMsg[int]{}, nil)
+
+		// when
+		err := peer.Close(context.Background())
+
+		// then
+		assert.UsingFmt(t.Errorf).
+			That(theerr.Is(err, causaltest.ErrScriptMismatch()))
+	})
+
+	t.Run("CloseReportsScriptMismtatchWhenASendWasScripted", func(t *testing.T) {
+		// given
+		var peer causaltest.ScriptedPeer[int]
+
+		peer.ScriptSend(causal.SyncMsg[int]{}, nil)
+
+		// when
+		err := peer.Close(context.Background())
 
 		// then
 		assert.UsingFmt(t.Errorf).
