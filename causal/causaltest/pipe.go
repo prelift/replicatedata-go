@@ -10,7 +10,7 @@ import (
 //
 // A single end of the pipe is not safe to use from multiple goroutines concurrently.
 //
-// Each end should be used from a different goroutines.
+// The two ends cannot be used from the same goroutine.
 // Send and Recv block, forcing the two goroutines to work in lock-step.
 func Pipe[Operation any]() (_, _ causal.RemotePeer[Operation]) {
 
