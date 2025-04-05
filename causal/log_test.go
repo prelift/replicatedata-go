@@ -1,6 +1,7 @@
 package causal_test
 
 import (
+	"context"
 	"testing"
 
 	"github.com/szabba/assert/v3"
@@ -8,6 +9,7 @@ import (
 	"github.com/szabba/assert/v3/assertions/theval"
 
 	"github.com/prelift/replicateddata-go/causal"
+	"github.com/prelift/replicateddata-go/causal/causaltest"
 	"github.com/prelift/replicateddata-go/internal/catch"
 )
 
@@ -93,11 +95,95 @@ func TestLog(t *testing.T) {
 
 	})
 
+	t.Run("AcceptSync", func(t *testing.T) {
+
+		t.Run("FailsWhenThePeerDoesNotProduceTheFirstMessage", func(t *testing.T) {
+			// given
+			var peer causaltest.ScriptedPeer[int]
+			peer.ScriptRecv(causal.SyncMsg[int]{}, causal.ErrGotNoMessage())
+			peer.ScriptClose(nil)
+
+			log, err := causal.NewLog[int]()
+			assert.UsingFmt(t.Fatalf).That(theerr.IsNil(err))
+
+			// when
+			err = log.AcceptSync(context.Background(), &peer)
+
+			// then
+			assert.UsingFmt(t.Errorf).
+				That(peer.PlayedOut()).
+				That(theerr.Is(err, causal.ErrGotNoMessage()))
+		})
+
+		t.Run("EndsWhenInformedOfCommunicationClosureOnFirstMessageReceiveAttempt", func(t *testing.T) {
+			// given
+			var peer causaltest.ScriptedPeer[int]
+			peer.ScriptRecv(causal.SyncMsg[int]{}, causal.ErrCommClosed())
+			peer.ScriptClose(nil)
+
+			log, err := causal.NewLog[int]()
+			assert.UsingFmt(t.Fatalf).That(theerr.IsNil(err))
+
+			// when
+			err = log.AcceptSync(context.Background(), &peer)
+
+			// then
+			assert.UsingFmt(t.Errorf).
+				That(peer.PlayedOut()).
+				That(theerr.IsNil(err))
+		})
+
+		t.Run("FailsWhenSendingTheFirstMessageToThePeerDoes", func(t *testing.T) {
+			// given
+			var peer causaltest.ScriptedPeer[int]
+			peer.ScriptRecv(causal.SyncMsg[int]{}, nil)
+			peer.ScriptSend(causal.SyncMsg[int]{}, causal.ErrSendFailed())
+			peer.ScriptClose(nil)
+
+			log, err := causal.NewLog[int]()
+			assert.UsingFmt(t.Fatalf).That(theerr.IsNil(err))
+
+			// when
+			err = log.AcceptSync(context.Background(), &peer)
+
+			// then
+			assert.UsingFmt(t.Errorf).
+				That(peer.PlayedOut()).
+				That(theerr.Is(err, causal.ErrSendFailed()))
+		})
+
+		t.Run("EndsWhenNotifiedOfCommunicationClosureOnFirstSendAttempt", func(t *testing.T) {
+			// given
+			var peer causaltest.ScriptedPeer[int]
+			peer.ScriptRecv(causal.SyncMsg[int]{}, nil)
+			peer.ScriptSend(causal.SyncMsg[int]{}, causal.ErrCommClosed())
+			peer.ScriptClose(nil)
+
+			log, err := causal.NewLog[int]()
+			assert.UsingFmt(t.Fatalf).That(theerr.IsNil(err))
+
+			// when
+			err = log.AcceptSync(context.Background(), &peer)
+
+			// then
+			assert.UsingFmt(t.Errorf).
+				That(peer.PlayedOut()).
+				That(theerr.IsNil(err))
+		})
+
+	})
+
 }
 
 func noninitLogCases() map[string]func(log *causal.Log[int]) {
 	return map[string]func(*causal.Log[int]){
 		"Here":     func(l *causal.Log[int]) { l.Here() },
 		"Snapshot": func(l *causal.Log[int]) { l.Snapshot() },
+		"AcceptSync": func(l *causal.Log[int]) {
+			l.AcceptSync(context.Background(), &causaltest.ScriptedPeer[int]{})
+		},
+		"OfferSync": func(l *causal.Log[int]) {
+			l.OfferSync(context.Background(), &causaltest.ScriptedPeer[int]{})
+		},
 	}
 }
