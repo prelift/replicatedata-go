@@ -125,7 +125,7 @@ func (log *Log[Operation]) OfferSync(ctx context.Context, p RemotePeer[Operation
 
 	defer func() {
 		if err != nil {
-			err = fmt.Errorf("causal.%T.AcceptSync: %w", log, err)
+			err = fmt.Errorf("causal.%T.OfferSync: %w", log, err)
 		}
 		cErr := p.Close(ctx)
 		if cErr != nil {
